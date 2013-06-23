@@ -94,7 +94,7 @@ def twitter_follow_all(api, results):
 		print 'now sleeping for a while'
 		for i in xrange(wait):
 			time.sleep(1)
-			if i = wait-1:
+			if i == wait-1:
 				print '.'
 			else:
 				print '.',
