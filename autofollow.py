@@ -144,14 +144,20 @@ else:
 
 if args['m'] == 1:
 	results = twitter_name_search(start_api(USER),args['place'][0])
-	#print results
-	twitter_follow_all(start_api(USER),results)
+	if args['print_only']:
+		print results
+	else:
+		twitter_follow_all(start_api(USER),results)
 elif args['m'] == 2:
 	results = scrape_twitaholic(args['place'][0])
-	twitter_follow_all(start_api(USER),results)
-	#print results
+	if args['print_only']:
+		print results
+	else:
+		twitter_follow_all(start_api(USER),results)
 elif args['m'] == 3:
 	results = twitter_geo_search(start_api(USER),name2geo(args['place'][0]))
-	twitter_follow_all(start_api(USER),results)
-	#print results
+	if args['print_only']:
+		print results
+	else:
+		twitter_follow_all(start_api(USER),results)
 
