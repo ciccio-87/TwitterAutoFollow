@@ -60,7 +60,7 @@ def start_api(keys):
 		print 'errors connecting to Twitter, exiting'
 		sys.exit(1)
 
-def twitter_geo_search(api, coord, q='', count=50, lang=None):
+def twitter_geo_search(api, coord, q='', lang, count=50):
 	geocode = coord + ',15mi'
 	if lang is None:
 		tweets = api.search.tweets(q=q,geocode=geocode,count=count)
@@ -73,7 +73,7 @@ def twitter_geo_search(api, coord, q='', count=50, lang=None):
 	print 'found ' + str(len(users)) + ' unique users'
 	return users[:20]
 
-def twitter_name_search(api,q,count=50, lang=None):
+def twitter_name_search(api, q, lang, count=50):
 	if lang is None:
 		tweets = api.search.tweets(q=q,count=count)
 	else:
