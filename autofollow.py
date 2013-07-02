@@ -60,9 +60,12 @@ def start_api(keys):
 		print 'errors connecting to Twitter, exiting'
 		sys.exit(1)
 
-def twitter_geo_search(api,coord, q='',count=50):
+def twitter_geo_search(api, coord, q='', count=50, lang=None):
 	geocode = coord + ',15mi'
-	tweets = api.search.tweets(q=q,geocode=geocode,count=count)
+	if lang is None:
+		tweets = api.search.tweets(q=q,geocode=geocode,count=count)
+	else:
+		tweets = api.search.tweets(q=q,geocode=geocode,count=count,lang=lang)
 	users = []
 	for status in tweets['statuses']:
 		users.append(status['user']['screen_name'])
@@ -70,8 +73,11 @@ def twitter_geo_search(api,coord, q='',count=50):
 	print 'found ' + str(len(users)) + ' unique users'
 	return users[:20]
 
-def twitter_name_search(api,q,count=50):
-	tweets = api.search.tweets(q=q,count=count)
+def twitter_name_search(api,q,count=50, lang=None):
+	if lang is None:
+		tweets = api.search.tweets(q=q,count=count)
+	else:
+		tweets = api.search.tweets(q=q,count=count,lang=lang)
 	users = []
 	for status in tweets['statuses']:
 		users.append(status['user']['screen_name'])
@@ -107,9 +113,10 @@ def twitter_follow_all(api, results):
 parser = argparse.ArgumentParser(description='Follow Twitter user near to a place of your choice')
 parser.add_argument('place', metavar='place', type=str, nargs=1,
                    help='the place to look for')
-parser.add_argument('-m', metavar='mode',type=int, nargs='?', default=1, 
+parser.add_argument('-m', '--mode', metavar='mode',type=int, nargs='?', default=1, 
 			help='search mode:\n\t1: place name search on Twitter\n\t2: scrape Twitaholic\n\t3: search nearby tweets (hard guesses on coordinates)')
-parser.add_argument('-f', action='store_true', help='enable use of a "settings.py" conf file (see example)')
+parser.add_argument('-f', '--file', action='store_true', help='enable use of a "settings.py" conf file (see example)')
+parser.add_argument('-l','--lang', type=str, metavar='LANG', nargs='?', help='Language for statuses search')
 parser.add_argument('--access_token', type=str, metavar='ACCESS_TOKEN', nargs='?', help='Twitter API access token')
 parser.add_argument('--access_token_secret', type=str, metavar='ACCESS_TOKEN_STRING', nargs='?', help='Twitter API access token secret')
 parser.add_argument('--consumer_key', type=str, metavar='CONSUMER_KEY', nargs='?', help='Twitter API consumer key')
@@ -118,13 +125,15 @@ parser.add_argument('--print-only', action='store_true',help='Just print results
 
 args = vars(parser.parse_args())
 
+print '\n\n' + str(args) + '\n\n'
+
 #if args['f'] is None and ((args['access_token'] is None) or (args['access_token_secret'] is None) or (args['consumer_secret'] is None) or (args['consumer_key'] is None)):
 #	if not args['print_only'] and args['m'] == 2: 
 #		print 'Twitter API credentials not given, exiting'
 #		print parser.print_help()
 #		sys.exit(0)
 
-if args['f']:
+if args['file']:
 	try:
 		from settings import USER
 	except:
@@ -142,20 +151,20 @@ else:
 	print parser.print_help()
 	sys.exit(0)
 
-if args['m'] == 1:
-	results = twitter_name_search(start_api(USER),args['place'][0])
+if args['mode'] == 1:
+	results = twitter_name_search(start_api(USER),args['place'][0],args['lang'])
 	if args['print_only']:
 		print results
 	else:
 		twitter_follow_all(start_api(USER),results)
-elif args['m'] == 2:
+elif args['mode'] == 2:
 	results = scrape_twitaholic(args['place'][0])
 	if args['print_only']:
 		print results
 	else:
 		twitter_follow_all(start_api(USER),results)
-elif args['m'] == 3:
-	results = twitter_geo_search(start_api(USER),name2geo(args['place'][0]))
+elif args['mode'] == 3:
+	results = twitter_geo_search(start_api(USER),name2geo(args['place'][0]),args['lang'])
 	if args['print_only']:
 		print results
 	else:
