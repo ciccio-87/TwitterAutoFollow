@@ -81,7 +81,7 @@ def twitter_geo_search(api, coord, lang, q='', count=50):
     return users
 
 
-def twitter_name_search(api, q, lang, count=50):
+def twitter_name_search(api, q='', lang='', count=50):
     if lang is None:
         tweets = api.search.tweets(q=q, count=count)
     else:
