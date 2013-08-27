@@ -160,6 +160,10 @@ parser.add_argument('--print-only', action='store_true',
                     help='Just print results, no real follow')
 parser.add_argument('-n','--max-follow', nargs='?', type=int, metavar='max_follow',
                     help='Maximun number of users to follow')
+parser.add_argument('-b','--blacklist', action='store_true',
+                    help='Use blacklist file')
+parser.add_argument('-bf','--blacklist-file', nargs='?', type=str, metavar='blacklist_file',
+                    help='Blacklist file')
 
 args = vars(parser.parse_args())
 
@@ -174,6 +178,11 @@ args = vars(parser.parse_args())
 if args['file']:
     try:
         from settings import USER
+        from settings import USE_BLACKLIST,BLACKLIST_FILE
+        if not args['blacklist']:
+	    args['blacklist'] = USE_BLACKLIST
+	    args['blacklist_file'] = BLACKLIST_FILE
+	    print str(args)
     except:
         print 'bad file given, exiting'
         sys.exit(1)
@@ -182,13 +191,14 @@ elif args['access_token'] and args['access_token_secret'] and args['consumer_key
     USER = args['access_token'], args['access_token_secret'], args[
         'consumer_key'], args['consumer_secret']
 
-elif args['print_only']:
-    print '\nprint-only mode enabled\n'
-
 else:
     print 'Twitter API credentials not given, exiting'
     print parser.print_help()
     sys.exit(0)
+    
+if args['print_only']:
+    print '\nprint-only mode enabled\n'
+
     
 if args['max_follow']:
     n = args['max_follow']
@@ -210,6 +220,20 @@ else:
     print 'mode not recognized'
     sys.exit(0)
 
+if args['blacklist']:
+    print 'Reading BlackList from file'
+    try:
+	bl = open(args['blacklist_file']).readlines()
+    except:
+	print 'troubles reading blacklist file'
+	sys.exit(0)
+    print 'found ' + str(len(bl)) + ' users in blacklist'
+    temp = []
+    for u in results:
+	if u not in bl:
+	    temp.append(u)
+    results = temp
+    
 if args['print_only']:
     print results
 else:
