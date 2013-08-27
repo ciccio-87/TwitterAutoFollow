@@ -222,8 +222,10 @@ else:
 
 if args['blacklist']:
     print 'Reading BlackList from file'
+    bl = []
     try:
-	bl = open(args['blacklist_file']).readlines()
+	for line in open(args['blacklist_file'],'r').readlines():
+            bl.append(line.rstrip())
     except:
 	print 'troubles reading blacklist file'
 	sys.exit(0)
